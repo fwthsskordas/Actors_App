@@ -1,37 +1,39 @@
 <script setup>
     import axios from "axios"
-    import { ref, watch } from "vue";
+    import { watch, ref, onMounted } from "vue";
     import Card from "./Card.vue"
 
-    const characters = ref(null);
-    const page = ref(0)
 
-    const response = await axios.get("https://www.breakingbadapi.com/api/characters?limit=8");
-    characters.value = response.data;
-    console.log(characters.value)
-    watch(page, async () => {
-        const res = await axios.get(`https://www.breakingbadapi.com/api/characters?limit=8&offset=${page.value * 8}`);
-        characters.value = res.data;
+    const characters = ref(null)
+    const page = ref(1)
+
+    onMounted(async () => {
+        const response = await axios.get("https://rickandmortyapi.com/api/character")
+        console.log(response)
+        characters.value = response.data.results
     })
-    
+
+    watch(page, async () => {
+        const res = await axios.get(`https://rickandmortyapi.com/api/character/?page=${page.value}`);
+        characters.value = res.data.results;
+    })
 
 </script>
 
 <template>
     <div class="container">
-        <div class="cards">
+        <div v-if="characters" class="cards">
             <Card 
                 v-for="character in characters"
-                :key="character.char_id"
-                :image="character.img"
+                :key="character.id"
+                :image="character.image"
                 :name="character.name"
             >
-                <div class="jobs">
-                    <p v-for="(job, index) in character.occupation" :key="job">
-                        {{job}}<span v-if="index < character.occupation.length - 1">,&nbsp</span>
-                    </p>
-                </div>
+                <p>{{character.location.name}}</p>
             </Card>
+        </div>
+        <div v-else class="cards spinner">
+            <NSpin size="large"/>
         </div>
         <div class="button-container">
             <button @click="page--">&lt</button>
@@ -43,14 +45,15 @@
 <style scoped>
 .container {
     background-color: rgb(27, 26, 26);
-    padding: 30px
+    padding: 30px;
+    margin-top: 100px;
 }
 .cards {
     max-width: 1000px;
     margin: 0 auto;
     display: flex;
     flex-wrap: wrap;
-    height: 700px
+    
 }
 .cards h3 {
     font-weight: bold;
@@ -58,7 +61,10 @@
 .cards p {
     font-size: 10px;
 }
-
+.jobs {
+    display: flex;
+    flex-wrap: wrap;
+}
 .button-container {
     display: flex;
     justify-content: center;
@@ -76,15 +82,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-p {
-    font-size: 10px;
-}
-
-.jobs {
-    display: flex;
-    flex-wrap: wrap;
 }
 
 </style>

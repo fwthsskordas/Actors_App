@@ -1,9 +1,9 @@
 <script setup>
     import {defineProps} from "vue"
 
-    const { image, name , length} = defineProps([
+    const {image, name } = defineProps([
         'image',
-        'name'
+        'name',
     ])
 </script>
 
@@ -13,11 +13,7 @@
       <img :src="image">
     </template>
     <h3>{{ name }}</h3>
-    <div class="jobs">
-        <p v-for="(job, index) in length " :key="job">
-            {{job}}<span v-if="index < length.length - 1"></span>
-        </p>
-    </div>
+    <slot></slot>
   </NCard>
 </template>
 
@@ -32,12 +28,5 @@
     height: 250px
 }
 
-p {
-    font-size: 10px;
-}
 
-.jobs {
-    display: flex;
-    flex-wrap: wrap;
-}
 </style>
